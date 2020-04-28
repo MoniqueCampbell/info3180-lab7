@@ -21,13 +21,14 @@ def upload():
     form = UploadForm()
     if request.method == 'POST' and form.validate_on_submit():
         file=Upload.file.data
-        description=Upload.description.data
-        file = request.files['photo'] 
+        description= request.files['description'] 
+        photo = request.files['photo'] 
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename)) 
         flash('File was successfully saved!','success')
         return jsonify({"message": "File Upload Successful","filename": '''+filename+''',"description": '''+description+'''})
     else:
+        form_errors(form)
         return jsonify({"errors": [{},{}]})
 
 # Please create all new routes and view functions above this route.
