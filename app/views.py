@@ -19,17 +19,13 @@ from flask import jsonify
 @app.route('/api/upload', methods=['POST'])
 def upload():
     form = UploadForm()
-    if request.method == 'POST' and form.validate_on_submit():
-        file=Upload.file.data
-        description= request.files['description'] 
-        photo = request.files['photo'] 
+    if request.method == 'POST' and form.validate_on_submit(): 
+        description = request.form['description'] 
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename)) 
-        flash('File was successfully saved!','success')
-        return jsonify({"message": "File Upload Successful","filename": '''+filename+''',"description": '''+description+'''})
+        return jsonify({"message": "File Upload Successful","filename":file,"description":description})
     else:
-        form_errors(form)
-        return jsonify({"errors": [{},{}]})
+        return jsonify({"errors": form_errors(form)})
 
 # Please create all new routes and view functions above this route.
 # This route is now our catch all route for our VueJS single page
