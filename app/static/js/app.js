@@ -37,42 +37,53 @@ Vue.component('app-footer', {
     }
 });
 
-Vue.component('upload-form', {
+let uploadform=Vue.component('upload-form', {
     template: `
-    <upload-form>
-        {% extends "base.html" %}
-
-          {% block main %}
+    <div>
             <div class="login-form center-block">
               <h2>Please fill in the form with the necessary details</h2>
-              {% include 'flash_messages.html' %}
-              <form action="{{ url_for('upload') }}" id="uploadForm" method="post" action="/process-file" enctype="multipart/form-data" @submit.prevent="uploadPhoto">
-                {{ form.csrf_token}}
-                <div class="form-group">
-                  {{ form.description.label }}
-                  {{ form.description(class='form-control', placeholder="Enter your username") }}
-                </div>
-                <div class="form-group">
-                  {{ form.photo.label }}
-                  {{ form.photo(class='form-control') }}
-                </div>
+              <form id="uploadForm" method="post" action="/api/upload" enctype="multipart/form-data" @submit.prevent="uploadPhoto">
+                
+                <label for="description">Description: </label><br>
+                <textarea cols="40" rows="5" id="description" name="description"></textarea>
+                <br><br>
+                <label for="photo"> Select a photo to upload</label>
+                <input type="file" name="photo" id="photo">  
+               
                 <button type="submit" name="submit" class="btn btn-primary btn-block">Submit</button>
               </form>
             </div>
-          {% endblock %}
-    </upload-form>
-    `,
-    let uploadForm = document.getElementById('uploadForm');
-    let form_data = new FormData(uploadForm); 
-    fetch("/api/upload", {uploadPhoto: 'POST',
-    body: form_data,
-    headers: {'X-CSRFToken': token},credentials: 'same-origin'})
-    .then(function (response) {return response.json();
-    }).then(function (jsonResponse) {// display a success messageconsole.log(jsonResponse);
-    }).catch(function (error) {console.log(error),
-    data: function() {
-      return {};
-    };
+    </div>
+    `, 
+     data: function() {
+      return{}
+    },
+    methods: { uploadPhoto:function(){
+        let uploadForm = document.getElementById('uploadForm');
+        let form_data = new FormData(uploadForm); 
+        fetch("/api/upload", 
+        {
+           method: 'POST',
+           body: form_data,
+           headers: {'X-CSRFToken': token},
+           credentials: 'same-origin' 
+        }) 
+        
+          .then(
+            function (response) 
+          {
+            return response.json();
+          }).then(function 
+            (jsonResponse) 
+          { 
+            // display a success message 
+            console.log(jsonResponse);
+          }).catch(function (error) {
+            console.log(error)
+          });
+        }
+    }
+  });
 
 const Home = Vue.component('home', {
    template: `
@@ -103,7 +114,7 @@ const router = new VueRouter({
     routes: [
         {path: "/", component: Home},
         // Put other routes here
-        {path: "/upload", component: upload-form},
+        {path: "/upload", component: uploadform},
         // This is a catch all route in case none of the above matches
         {path: "*", component: NotFound}
     ]
